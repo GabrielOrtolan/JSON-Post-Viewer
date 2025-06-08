@@ -6,54 +6,61 @@ import {
   CircularProgress,
   Grid,
   Alert,
+  Box
 } from '@mui/material';
-import PostCard from '../../components/PostCard';
+import PostCard from '../../components/PostCard'; // O caminho para o nosso Card
 
-function Post() {
+function PostPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Função que será chamada quando um card for clicado
+  const handleCardClick = (postId) => {
+    // Nosso teste para ver se o clique está sendo ouvido
+    console.log('O clique funcionou! Navegando para os detalhes do post ID:', postId);
+    
+    // Ação para abrir a nova aba
+    window.open(`/dados/${postId}`, '_blank');
+  };
+
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await getPosts();
+    getPosts()
+      .then(response => {
         setPosts(response.data);
-      } catch (err) {
+      })
+      .catch(err => {
         setError('Falha ao carregar os posts.');
-        console.error(err);
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-    fetchPosts();
+      });
   }, []);
 
   if (loading) {
     return (
-      <Container style={{ textAlign: 'center', marginTop: '50px' }}>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
         <CircularProgress />
-      </Container>
+      </Box>
     );
   }
 
   if (error) {
-    return (
-      <Container>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
+    return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
   }
 
   return (
-    <Container>
-      <Typography variant="h2" component="h1" gutterBottom align="center" style={{ margin: '20px 0' }}>
+    <Container sx={{ py: 4 }}>
+      <Typography variant="h3" component="h1" gutterBottom align="center">
         Posts
       </Typography>
       <Grid container spacing={4}>
-        {posts.map((post) => (
+        {posts.map(post => (
           <Grid item key={post.id} xs={12} sm={6} md={4}>
-            <PostCard post={post} />
+            {/* AQUI ESTÁ A CORREÇÃO FINAL:
+              Estamos passando a função 'handleCardClick' para a propriedade 'onClick' do PostCard.
+            */}
+            <PostCard post={post} onClick={() => handleCardClick(post.id)} />
           </Grid>
         ))}
       </Grid>
@@ -61,4 +68,4 @@ function Post() {
   );
 }
 
-export default Post;
+export default PostPage;
