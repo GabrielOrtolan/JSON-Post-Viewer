@@ -7,23 +7,20 @@ import {
   Grid,
   Alert,
   Box,
-  TextField,
-  Pagination, // Importante para a paginação
-  Stack       // Importante para alinhar a paginação
+  Pagination,
+  Stack
 } from '@mui/material';
 import PostCard from '../../components/PostCard';
-
-// Nota: Não estamos importando o PostCardSkeleton aqui, mantendo simples.
+import PostCardSkeleton from '../../components/PostCardSkeleton';
 
 function PostPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Estados que controlam a paginação
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 12; // 12 posts por página
+  const postsPerPage = 12;
 
   useEffect(() => {
     getPosts()
@@ -43,21 +40,26 @@ function PostPage() {
     window.open(`/dados/${postId}`, '_blank');
   };
 
-  // Lógica para filtrar e depois paginar os resultados
-  const filteredPosts = posts.filter(post =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  // Lógica de Paginação (agora aplicada diretamente na lista completa de posts)
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
-  const pageCount = Math.ceil(filteredPosts.length / postsPerPage);
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const pageCount = Math.ceil(posts.length / postsPerPage);
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
-        <CircularProgress />
-      </Box>
+      <Container sx={{ py: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom align="center">
+          Posts
+        </Typography>
+        <Grid container spacing={4}>
+          {Array.from(new Array(6)).map((item, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4}>
+              <PostCardSkeleton />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     );
   }
 
@@ -67,33 +69,18 @@ function PostPage() {
 
   return (
     <Container sx={{ py: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom align="center">
+      <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
         Posts
       </Typography>
 
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
-        <TextField
-          label="Buscar por título"
-          variant="outlined"
-          fullWidth
-          sx={{ maxWidth: '500px' }}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // Importante: Volta para a página 1 ao fazer uma nova busca
-          }}
-        />
-      </Box>
-
       <Grid container spacing={4}>
-        {/* Alterado para usar "currentPosts", que são os posts da página atual */}
         {currentPosts.map(post => (
           <Grid item key={post.id} xs={12} sm={6} md={4}>
             <PostCard post={post} onClick={() => handleCardClick(post.id)} />
           </Grid>
         ))}
       </Grid>
-      
-      {/* Componente de paginação adicionado no final */}
+
       <Stack spacing={2} sx={{ mt: 5, alignItems: 'center' }}>
         <Pagination
           count={pageCount}
