@@ -11,15 +11,21 @@ import {
   Stack
 } from '@mui/material';
 import PostCard from '../../components/PostCard';
+import useDocumentTitle from '../../hooks/useDocumentTitle'; // 1. Importa o hook
 
 function PostPage() {
+  useDocumentTitle('JSON Post Viewer'); // 2. Usa o hook para definir o título
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 12;
-
+  
+// ...
+// Hook de efeito para buscar os posts da API assim que a página carrega.
+// O array vazio no final `[]` garante que a busca aconteça apenas uma vez.
   useEffect(() => {
     getPosts()
       .then(response => {
