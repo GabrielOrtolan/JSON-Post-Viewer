@@ -12,13 +12,11 @@ import {
 } from '@mui/material';
 import PostCard from '../../components/PostCard';
 
-// O PostCardSkeleton foi removido das importações.
-
 function PostPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 12;
 
@@ -39,13 +37,12 @@ function PostPage() {
   const handleCardClick = (postId) => {
     window.open(`/dados/${postId}`, '_blank');
   };
-
+  
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
   const pageCount = Math.ceil(posts.length / postsPerPage);
 
-  // A lógica de loading agora volta a mostrar apenas o spinner central.
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
@@ -61,7 +58,7 @@ function PostPage() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h3" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        Posts
+        JSON Post Viewer
       </Typography>
 
       <Grid container spacing={4}>
@@ -71,7 +68,7 @@ function PostPage() {
           </Grid>
         ))}
       </Grid>
-
+      
       <Stack spacing={2} sx={{ mt: 5, alignItems: 'center' }}>
         <Pagination
           count={pageCount}
