@@ -1,29 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-// Importando as duas funções da API
 import { getPostById, getUserById } from '../../api/services';
-import { Container, Typography, CircularProgress, Alert, Card, CardContent, Box } from '@mui/material';
+import {
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Box,
+  Grid,
+  CircularProgress,
+  Alert
+} from '@mui/material';
+import useDocumentTitle from '../../hooks/useDocumentTitle'; // 1. Importa o hook
 
-// Renomeando para um nome mais claro, se preferir
-function DetailsPage() { 
+function DetailsPage() {
   const { id } = useParams();
   const [post, setPost] = useState(null);
-  const [author, setAuthor] = useState(null); // Estado para guardar os dados do autor
+  const [author, setAuthor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 2. Usa o hook para definir um título dinâmico
+  useDocumentTitle(loading ? 'Carregando...' : (post ? post.title : 'Post não encontrado'));
 
   useEffect(() => {
     if (id) {
       setLoading(true);
-      // 1. Primeiro, buscamos o post
       getPostById(id)
         .then(postResponse => {
-          setPost(postResponse.data);
-          // 2. Assim que temos o post, usamos o postResponse.data.userId para buscar o autor
-          return getUserById(postResponse.data.userId); 
+          const fetchedPost = postResponse.data;
+          setPost(fetchedPost);
+          return getUserById(fetchedPost.userId);
         })
         .then(userResponse => {
-          // 3. Guardamos os dados do autor
           setAuthor(userResponse.data);
         })
         .catch(err => {
@@ -50,7 +59,6 @@ function DetailsPage() {
 
   return (
     <Container sx={{ py: 4 }}>
-      {/* Card do Post */}
       {post && (
         <Card sx={{ mb: 4 }}>
           <CardContent sx={{ p: 3 }}>
@@ -64,17 +72,25 @@ function DetailsPage() {
         </Card>
       )}
 
-      {/* Card do Autor (só aparece quando os dados do autor carregam) */}
       {author && (
         <Card>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="h5" component="h2" gutterBottom>
               Informações do Autor
             </Typography>
-            <Typography><strong>Nome:</strong> {author.name}</Typography>
-            <Typography><strong>Email:</strong> {author.email}</Typography>
-            <Typography><strong>Website:</strong> {author.website}</Typography>
-            <Typography><strong>Empresa:</strong> {author.company.name}</Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6}>
+                <Typography><strong>Nome:</strong> {author.name}</Typography>
+                <Typography><strong>Usuário:</strong> @{author.username}</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Typography><strong>Email:</strong> {author.email}</Typography>
+                <Typography><strong>Website:</strong> {author.website}</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Typography><strong>Empresa:</strong> {author.company.name}</Typography>
+              </Grid>
+            </Grid>
           </CardContent>
         </Card>
       )}
