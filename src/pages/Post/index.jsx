@@ -8,11 +8,12 @@ import {
   Alert,
   Box,
   TextField,
-  Pagination, // Importa o componente de paginação
-  Stack       // Importa o Stack para ajudar a alinhar
+  Pagination, // Importante para a paginação
+  Stack       // Importante para alinhar a paginação
 } from '@mui/material';
 import PostCard from '../../components/PostCard';
-import PostCardSkeleton from '../../components/PostCardSkeleton';
+
+// Nota: Não estamos importando o PostCardSkeleton aqui, mantendo simples.
 
 function PostPage() {
   const [posts, setPosts] = useState([]);
@@ -20,9 +21,9 @@ function PostPage() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // ---> ESTADOS PARA A PAGINAÇÃO
+  // Estados que controlam a paginação
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 12; // Define quantos posts queremos por página
+  const postsPerPage = 12; // 12 posts por página
 
   useEffect(() => {
     getPosts()
@@ -30,8 +31,8 @@ function PostPage() {
         setPosts(response.data);
       })
       .catch(err => {
-        console.error("Erro ao buscar posts: ", err);
         setError("Não foi possível carregar os posts.");
+        console.error("Erro ao buscar posts: ", err);
       })
       .finally(() => {
         setLoading(false);
@@ -39,11 +40,10 @@ function PostPage() {
   }, []);
 
   const handleCardClick = (postId) => {
-    console.log('Navegando para os detalhes do post ID:', postId);
     window.open(`/dados/${postId}`, '_blank');
   };
-  
-  // ---> LÓGICA PARA FILTRAR E PAGINAR OS POSTS
+
+  // Lógica para filtrar e depois paginar os resultados
   const filteredPosts = posts.filter(post =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -53,30 +53,16 @@ function PostPage() {
   const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
   const pageCount = Math.ceil(filteredPosts.length / postsPerPage);
 
-  // O if de loading agora mostra os esqueletos que criamos
   if (loading) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom align="center">
-          Posts
-        </Typography>
-        <Grid container spacing={4}>
-          {Array.from(new Array(6)).map((item, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4}>
-              <PostCardSkeleton />
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
     );
   }
 
   if (error) {
-    return (
-      <Container sx={{ mt: 4 }}>
-        <Alert severity="error">{error}</Alert>
-      </Container>
-    );
+    return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
   }
 
   return (
@@ -93,13 +79,13 @@ function PostPage() {
           sx={{ maxWidth: '500px' }}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setCurrentPage(1); // Volta para a primeira página ao buscar
+            setCurrentPage(1); // Importante: Volta para a página 1 ao fazer uma nova busca
           }}
         />
       </Box>
 
       <Grid container spacing={4}>
-        {/* Agora o .map usa os posts da página atual (currentPosts) */}
+        {/* Alterado para usar "currentPosts", que são os posts da página atual */}
         {currentPosts.map(post => (
           <Grid item key={post.id} xs={12} sm={6} md={4}>
             <PostCard post={post} onClick={() => handleCardClick(post.id)} />
@@ -107,7 +93,7 @@ function PostPage() {
         ))}
       </Grid>
       
-      {/* Adicionamos os botões de paginação no final da página */}
+      {/* Componente de paginação adicionado no final */}
       <Stack spacing={2} sx={{ mt: 5, alignItems: 'center' }}>
         <Pagination
           count={pageCount}
@@ -115,8 +101,6 @@ function PostPage() {
           onChange={(event, value) => setCurrentPage(value)}
           color="primary"
           size="large"
-          showFirstButton
-          showLastButton
         />
       </Stack>
     </Container>
