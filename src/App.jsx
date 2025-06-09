@@ -1,7 +1,13 @@
 import AppRoutes from './routes';
+import { CssBaseline } from '@mui/material';
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <>
+      <CssBaseline />
+      <AppRoutes />
+    </>
+  );
 }
 
 export default App;
