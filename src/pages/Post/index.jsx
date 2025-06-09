@@ -11,14 +11,14 @@ import {
   Stack
 } from '@mui/material';
 import PostCard from '../../components/PostCard';
-import PostCardSkeleton from '../../components/PostCardSkeleton';
+
+// O PostCardSkeleton foi removido das importações.
 
 function PostPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Estados que controlam a paginação
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 12;
 
@@ -40,26 +40,17 @@ function PostPage() {
     window.open(`/dados/${postId}`, '_blank');
   };
 
-  // Lógica de Paginação (agora aplicada diretamente na lista completa de posts)
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
   const pageCount = Math.ceil(posts.length / postsPerPage);
 
+  // A lógica de loading agora volta a mostrar apenas o spinner central.
   if (loading) {
     return (
-      <Container sx={{ py: 4 }}>
-        <Typography variant="h3" component="h1" gutterBottom align="center">
-          Posts
-        </Typography>
-        <Grid container spacing={4}>
-          {Array.from(new Array(6)).map((item, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4}>
-              <PostCardSkeleton />
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+        <CircularProgress />
+      </Box>
     );
   }
 
